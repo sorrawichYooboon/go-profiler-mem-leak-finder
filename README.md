@@ -33,14 +33,40 @@ The application runs a simple HTTP server (on port 8080) and includes:
    ```
 2. Get Dependencies:
    ```bash
-    go get github.com/labstack/echo/v4
-    go get github.com/labstack/echo-contrib/pprof
+   go get github.com/labstack/echo/v4
+   go get github.com/labstack/echo-contrib/pprof
+   go get -u github.com/swaggo/swag/cmd/swag
+   go get -u github.com/swaggo/echo-swagger
     ```
-3. Run the Application:
+3. Generate Swagger Docs:
+   ```bash
+   swag init -g cmd/server/main.go
+   ```
+4. Run the Application:
     ```bash
     go run main.go
     ```
 The console will log the server start. No leaks are active yet.
+
+## 🤔 Understanding the Leaks
+
+### Heap Leak
+
+A heap leak occurs when memory is allocated on the heap, but is no longer needed by the application and is not released by the garbage collector. This is typically caused by global variables or other long-lived objects that hold references to objects that are no longer in use.
+
+### Goroutine Leak
+
+A goroutine leak occurs when a goroutine is started but never finishes. This can happen if a goroutine is blocked on a channel that is never written to, or if it is waiting for a condition that never becomes true. Goroutine leaks can lead to increased memory usage and can eventually cause the application to crash.
+
+### Why Each Endpoint is a Leak
+
+*   `/start-leak/slice`: This endpoint starts a goroutine that continuously appends data to a global slice. Because the slice is global, it is never garbage collected, and the memory usage of the application will continue to grow.
+*   `/start-leak/channel`: This endpoint starts a goroutine that sends data to a channel. However, there is no other goroutine that is receiving data from the channel. This causes the sending goroutine to block indefinitely, resulting in a goroutine leak.
+*   `/start-leak/mutex`: This endpoint starts a goroutine that continuously adds data to a global map. The map is protected by a mutex to prevent race conditions. However, because the map is global, it is never garbage collected, and the memory usage of the application will continue to grow.
+
+## 🚀 How to Use Swagger
+
+Swagger is a tool that allows you to visualize and interact with the API. To use Swagger, navigate to `http://localhost:8080/swagger/index.html` in your browser.
 
 ## 🔬 How to Find the Memory Leaks
 
