@@ -1,0 +1,59 @@
+info:
+  contact: {}
+paths:
+  /leak-test:
+    get:
+      consumes:
+      - application/json
+      description: Check the status of the leaks
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Leak status
+          schema:
+            type: string
+      summary: Check the status of the leaks
+      tags:
+      - leaks
+  /safe-test:
+    get:
+      consumes:
+      - application/json
+      description: Start a safe goroutine that does not leak
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Safe goroutine started
+          schema:
+            type: string
+      summary: Start a safe goroutine
+      tags:
+      - leaks
+  /start-leak/{type}:
+    get:
+      consumes:
+      - application/json
+      description: Start a memory leak of a specific type
+      parameters:
+      - description: Leak type
+        enum:
+        - slice
+        - channel
+        - mutex
+        in: path
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Leak started
+          schema:
+            type: string
+      summary: Start a memory leak
+      tags:
+      - leaks
+swagger: "2.0"
